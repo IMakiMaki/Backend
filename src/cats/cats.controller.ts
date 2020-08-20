@@ -12,17 +12,18 @@ import {
   Ip,
   Header,
   Redirect,
-  HttpException,
-  HttpStatus,
   UsePipes,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { CreateCatDto, ListAllEntities, UpdateCatDto, createCatSchema } from './dto/cat.dto';
 import { CatsService } from './cats.service';
 import { Cat } from './interface/cat.interface';
-import { JoiValidationPipe } from 'src/common/pipes/joiValidation.pipe';
-import { compile, object } from '@hapi/joi';
-import Joi = require('@hapi/joi');
+import { JoiValidationPipe } from 'src/common/pipes/joi-validation.pipe';
+import { ValidationPipe } from 'src/common/pipes/validation.pipe';
+import { ParseIntPipe } from 'src/common/pipes/parse-int.pipe';
+import { CatByIdPipe } from 'src/common/pipes/cat-by-id.pipe';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { IsCached } from 'src/common/decorators/is-cached.decorator';
 
 // 限制请求主机的HOST
 @Controller({ host: 'localhost', path: 'cats' })
@@ -45,9 +46,22 @@ export class CatsController {
   // 设置response header
   @Post()
   @Header('access-token', '2121xxxx')
+  // 通过Joi验证参数
   @UsePipes(new JoiValidationPipe(createCatSchema))
   async createCat(@Body() createCatDto: CreateCatDto): Promise<Cat> {
     return this.catsService.create(createCatDto);
+  }
+
+  @Post('validation')
+  @Roles('admin')
+  async validationCreate(@Body(/*new ValidationPipe()*/) createCatDto: CreateCatDto): Promise<Cat> {
+    return await this.catsService.create(createCatDto);
+  }
+
+  @Post('validation2')
+  // @UsePipes(new ValidationPipe())
+  async validationCreate2(@Body() createCatDto: CreateCatDto): Promise<Cat> {
+    return await this.catsService.create(createCatDto);
   }
 
   // 重定向
@@ -63,17 +77,22 @@ export class CatsController {
   @Get()
   findAll(@Query() query: ListAllEntities): Promise<Cat[]> {
     // throw new HttpException({ xxxx: 1221, sasa: 'xxxx' }, HttpStatus.FORBIDDEN); //  抛出异常
-    return this.catsService.findAll();
+    return this.catsService.findAll(query.limit);
   }
 
-  @Get(':id/:oo')
-  findOne(@Param('id') id: string, @Param('oo') oo: string): string {
-    return `This action returns a #${id} ${oo} cat`;
+  @Get(':id')
+  @IsCached(false)
+  async findOne(@Param('id', ParseIntPipe, CatByIdPipe) cat: Cat): Promise<Cat> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(cat);
+      }, 500);
+    });
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateCatDto: UpdateCatDto): string {
-    return `This action updates a #${id} cat`;
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateCatDto: UpdateCatDto): Promise<Cat> {
+    return this.catsService.update(id, updateCatDto);
   }
 
   @Delete(':id')
