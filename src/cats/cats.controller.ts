@@ -17,7 +17,7 @@ import {
 import { Response, Request } from 'express';
 import { CreateCatDto, ListAllEntities, UpdateCatDto, createCatSchema } from './dto/cat.dto';
 import { CatsService } from './cats.service';
-import { Cat } from './interface/cat.interface';
+import { Cat } from './interfaces/cat.interface';
 import { JoiValidationPipe } from 'src/common/pipes/joi-validation.pipe';
 import { ValidationPipe } from 'src/common/pipes/validation.pipe';
 import { ParseIntPipe } from 'src/common/pipes/parse-int.pipe';

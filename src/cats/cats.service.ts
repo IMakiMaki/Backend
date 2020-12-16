@@ -1,5 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { Cat } from './interface/cat.interface';
+import { Cat } from './interfaces/cat.interface';
 
 @Injectable()
 export class CatsService {

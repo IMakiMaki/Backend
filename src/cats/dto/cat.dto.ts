@@ -1,6 +1,6 @@
 import Joi = require('@hapi/joi');
 import { IsString, IsInt, IsNumberString } from 'class-validator';
-import { Cat } from '../interface/cat.interface';
+import { Cat } from '../interfaces/cat.interface';
 
 export class CreateCatDto implements Omit<Cat, 'id'> {
   @IsString()

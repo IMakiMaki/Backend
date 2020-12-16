@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { jwtConstants } from '../constants';
-import { UserInfo } from 'src/users/interface/user';
-import { SignNature } from '../interface/sign-nature.interface';
+import { ValidateInfo } from 'src/users/dto/user.dto';
+import { SignNature } from '../interfaces/sign-nature.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -15,7 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: SignNature): Promise<UserInfo> {
-    return { userId: payload.sub, username: payload.username };
+  async validate(payload: SignNature): Promise<ValidateInfo> {
+    return { id: payload.sub, userName: payload.username };
   }
 }

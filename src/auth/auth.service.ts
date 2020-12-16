@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
-import { UserInfo } from 'src/users/interface/user';
+import { UserInfo } from 'src/users/dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { SignNature } from './interface/sign-nature.interface';
+import { SignNature } from './interfaces/sign-nature.interface';
 import { LoginInfo } from 'src/auth/dto/login-info.dto';
 
 @Injectable()
@@ -22,7 +22,7 @@ export class AuthService {
   }
 
   async login(user: UserInfo): Promise<{ access_token: string }> {
-    const payload: SignNature = { username: user.username, sub: user.userId };
+    const payload: SignNature = { username: user.userName, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };

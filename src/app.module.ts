@@ -2,17 +2,24 @@ import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CatsModule } from './cats/cats.module';
-import { CatsController } from './cats/cats.controller';
 import { APP_FILTER, APP_PIPE, APP_GUARD } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/filters/any-exception.filter';
 import { ValidationPipe } from './common/pipes/validation.pipe';
-import { RolesGuard } from './common/guard/roles.guard';
+import { RolesGuard } from './common/guards/roles.guard';
 import { Interceptors } from './common/interceptors';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [CatsModule, AuthModule, UsersModule],
+  imports: [
+    TypeOrmModule.forRoot({ autoLoadEntities: true }),
+    CatsModule,
+    AuthModule,
+    UsersModule,
+    ConfigModule.forRoot(),
+  ],
   controllers: [AppController],
   providers: [
     AppService,

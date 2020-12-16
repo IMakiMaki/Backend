@@ -1,6 +1,6 @@
 import { PipeTransform, ArgumentMetadata, BadRequestException, Injectable } from '@nestjs/common';
 import { CatsService } from 'src/cats/cats.service';
-import { Cat } from 'src/cats/interface/cat.interface';
+import { Cat } from 'src/cats/interfaces/cat.interface';
 
 @Injectable()
 export class CatByIdPipe implements PipeTransform<unknown, Promise<Cat>> {

@@ -1,19 +1,52 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './interface/user';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { Repository, Connection } from 'typeorm';
+import { UserInfo } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
-  private readonly users: User[];
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+    private connection: Connection
+  ) {}
 
-  constructor() {
-    this.users = [
-      { userId: 1, username: 'john', password: 'changeme' },
-      { userId: 2, username: 'chris', password: 'secret' },
-      { userId: 3, username: 'maria', password: 'guess' },
-    ];
+  async createMany(users: User[]): Promise<unknown> {
+    const queryRunner = this.connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      users.forEach(async (user) => {
+        await queryRunner.manager.save<User>(user);
+      });
+      await queryRunner.commitTransaction();
+      return { success: true };
+    } catch (err) {
+      // 如果遇到错误，可以回滚事务
+      await queryRunner.rollbackTransaction();
+      return err;
+    } finally {
+      // 手动实例化并部署一个queryRunner
+      await queryRunner.release();
+    }
   }
 
-  async findOne(username: string): Promise<User | undefined> {
-    return this.users.find((user) => user.username === username);
+  findAll(): Promise<User[]> {
+    return this.usersRepository.find();
+  }
+
+  findOneByMsq(id: string): Promise<User | undefined> {
+    return this.usersRepository.findOne(id);
+  }
+
+  async remove(id: string): Promise<void> {
+    await this.usersRepository.delete(id);
+  }
+
+  findOne(userName: string): Promise<User | undefined> {
+    return this.usersRepository.findOne({ userName }, { relations: ['photos'] });
   }
 }
