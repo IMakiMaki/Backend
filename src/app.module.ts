@@ -40,7 +40,7 @@ import { ConfigModule } from '@nestjs/config';
   ],
 })
 export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer): void {
+  configure(_consumer: MiddlewareConsumer): void {
     // 将中间件加入/cats路由的请求中
     // consumer.apply(LoggerMiddleware).forRoutes({
     //   path: 'cats',

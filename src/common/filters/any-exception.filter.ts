@@ -19,7 +19,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let message: string | Record<string, any>;
     console.log(exception);
     if (exception instanceof HttpException) {
-      (message = exception.getResponse()), (status = exception.getStatus());
+      message = exception.getResponse();
+      status = exception.getStatus();
     } else {
       status = HttpStatus.INTERNAL_SERVER_ERROR;
       message = 'error';
